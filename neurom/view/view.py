@@ -34,6 +34,7 @@ from mpl_toolkits.mplot3d.art3d import \
     Line3DCollection  # pylint: disable=relative-import
 
 import numpy as np
+
 from neurom import NeuriteType, geom
 from neurom._compat import zip
 from neurom.core import iter_neurites, iter_segments
@@ -161,7 +162,7 @@ def plot_soma(ax, soma, plane='xy',
 
 # pylint: disable=too-many-arguments
 def plot_neuron(ax, nrn,
-                neurite_type=NeuriteType.all,
+                neurite_type=None,
                 plane='xy',
                 soma_outline=True,
                 diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
@@ -179,8 +180,9 @@ def plot_neuron(ax, nrn,
         color(str or None): Color of plotted values, None corresponds to default choice
         alpha(float): Transparency of plotted values
     '''
-    plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
-              color=color, alpha=alpha)
+    if nrn.soma.points.size:
+        plot_soma(ax, nrn.soma, plane=plane, soma_outline=soma_outline, linewidth=linewidth,
+                  color=color, alpha=alpha)
 
     for neurite in iter_neurites(nrn, filt=tree_type_checker(neurite_type)):
         plot_tree(ax, neurite, plane=plane,
@@ -223,7 +225,7 @@ def plot_tree3d(ax, tree,
     segs = [(s[0][COLS.XYZ], s[1][COLS.XYZ]) for s in iter_segments(tree)]
 
     linewidth = _get_linewidth(tree, diameter_scale=diameter_scale, linewidth=linewidth)
-    color = _get_color(color, tree.type)
+    color = (_get_color(color, tree.type),)
 
     collection = Line3DCollection(segs, color=color, linewidth=linewidth, alpha=alpha)
     ax.add_collection3d(collection)
@@ -256,7 +258,7 @@ def plot_soma3d(ax, soma, color=None, alpha=_ALPHA):
     _update_3d_datalim(ax, soma)
 
 
-def plot_neuron3d(ax, nrn, neurite_type=NeuriteType.all,
+def plot_neuron3d(ax, nrn, neurite_type=None,
                   diameter_scale=_DIAMETER_SCALE, linewidth=_LINEWIDTH,
                   color=None, alpha=_ALPHA):
     '''
