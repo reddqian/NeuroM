@@ -340,3 +340,9 @@ def has_no_single_children(neuron):
                for annot in single_child_annotations]
 
     return CheckResult(len(bad_ids) == 0, bad_ids)
+
+
+def has_multifurcation(neuron):
+    bad_ids = [(section.id, [section.points[-1]]) for section in iter_sections(neuron)
+               if len(section.children) > 3]
+    return CheckResult(len(bad_ids) == 0, bad_ids)
